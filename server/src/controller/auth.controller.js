@@ -4,16 +4,7 @@ import generateToken from "../utility/generateToken.js";
 
 export async function register(req, res) {
   try {
-    //req body se teeno cheez nikal denge
-
     const { username, email, password } = req.body;
-
-    //ager koi b filed nhi daali hoge toh error jayega
-    if (!username || !email || !password) {
-      return res.status(400).json({
-        error: "All fields are required",
-      });
-    }
 
     //check krege ki kya user phele se exit karta h ya nhi
     const existing = await User.findOne({ $or: [{ email }, { username }] });
