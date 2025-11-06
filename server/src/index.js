@@ -1,16 +1,20 @@
-require("dotenv").config();
-const express = require("express");
-const mongoose = require("mongoose");
-const cors = require("cors");
-const helmet = require("helmet");
+import "dotenv/config";
+import express from "express";
+import mongoose from "mongoose";
+import cors from "cors";
+import helmet from "helmet";
+import connectDB from "./config/db.js";
+import authRoutes from "./routes/auth.js";
+
 const app = express();
-const connectDB = require("./config/db.js");
 
 app.use(helmet());
 app.use(cors());
 app.use(express.json());
 
 connectDB();
+
+app.use("/api/auth", authRoutes);
 
 app.get("/api/test", (req, res) => {
   res.json({ message: "Backend is LIVE!" });
