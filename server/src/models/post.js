@@ -1,5 +1,5 @@
-const mongoose = require("mongoose");
-const slugify = require("slugify");
+import mongoose from "mongoose";
+import slugify from "slugify";
 
 const PostSchema = new mongoose.Schema(
   {
@@ -71,4 +71,6 @@ PostSchema.pre("save", async function (next) {
   next();
 });
 
-module.exports = mongoose.model("Post", PostSchema);
+const Post = mongoose.model("Post", PostSchema);
+
+export default Post;
