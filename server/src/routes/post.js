@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { validate } from "../validation/auth.validation.js";
+import protect from "../middleware/protect.js";
 import {
   postUpdateValidation,
   postValidation,
@@ -14,8 +15,8 @@ import {
 
 const postroute = Router();
 
-postroute.post("/", validate(postValidation), createPost);
-postroute.put("/:id", validate(postUpdateValidation), updatePost);
-postroute.get("/", validate(queryValidation, "query"), getPosts);
+postroute.post("/", protect, validate(postValidation), createPost);
+postroute.put("/:id", protect, validate(postUpdateValidation), updatePost);
+postroute.get("/", protect, validate(queryValidation, "query"), getPosts);
 
 export default postroute;

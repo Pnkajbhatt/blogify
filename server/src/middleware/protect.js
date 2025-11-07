@@ -24,6 +24,7 @@ export default function protect(req, res, next) {
     req.userId = decoded.id || decoded._id || decoded.sub;
     req._id = req.userId; // compatibility with handlers checking req._id
 
+    req.user = { _id: req.userId };
     if (!req.userId) {
       return res.status(401).json({ error: "Invalid token payload" });
     }

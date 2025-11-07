@@ -1,4 +1,4 @@
-import post from "../models/post.js";
+import Post from "../models/post.js";
 import mongoose from "mongoose";
 // Adjust path as needed
 
@@ -10,16 +10,6 @@ const likeCooldown = new Map();
 // @access  Public
 export const getPosts = async (req, res) => {
   try {
-    // Validate query parameters
-    const { error, value } = queryValidation.validate(req.query);
-    if (error) {
-      return res.status(400).json({
-        success: false,
-        message: "Validation error",
-        error: error.details[0].message,
-      });
-    }
-
     const {
       page = 1,
       limit = 10,
@@ -32,7 +22,7 @@ export const getPosts = async (req, res) => {
       minLikes,
       featured,
       status = "published",
-    } = value;
+    } = req.query;
 
     // Build query - exclude soft-deleted posts
     const query = { isDeleted: false };
@@ -85,8 +75,7 @@ export const getPosts = async (req, res) => {
     }
 
     // Execute query with pagination
-    const posts = await post
-      .find(query)
+    const posts = await Post.find(query)
       .populate("author", "name email avatar")
       .populate("likes.user", "name avatar")
       .sort(sort)
@@ -95,7 +84,7 @@ export const getPosts = async (req, res) => {
       .lean();
 
     // Get total count for pagination
-    const total = await post.countDocuments(query);
+    const total = await Post.countDocuments(query);
 
     res.status(200).json({
       success: true,
@@ -127,8 +116,7 @@ export const getPost = async (req, res) => {
       ? { _id: identifier, isDeleted: false }
       : { slug: identifier, isDeleted: false };
 
-    const post = await post
-      .findOne(query)
+    const post = await Post.findOne(query)
       .populate("author", "name email avatar bio")
       .populate("likes.user", "name avatar");
 
@@ -169,13 +157,13 @@ export const createPost = async (req, res) => {
       images,
       status = "published",
       featured = false,
-    } = value;
+    } = req.body;
 
     // Create post with authenticated user as author
-    const post = await post.create({
+    const post = await Post.create({
       title: title.trim(),
       content: content.trim(),
-      author: req.user.id,
+      author: req.user._id,
       tags: tags || [],
       images: images || [],
       status,
@@ -184,7 +172,7 @@ export const createPost = async (req, res) => {
 
     // Populate author details
     await post.populate("author", "name email avatar");
-
+    console.log("req.user:", req.user);
     res.status(201).json({
       success: true,
       message: "Post created successfully",
@@ -228,7 +216,7 @@ export const updatePost = async (req, res) => {
 
     const { title, content, tags, images, status, featured } = value;
 
-    let post = await post.findOne({ _id: id, isDeleted: false });
+    let post = await Post.findOne({ _id: id, isDeleted: false });
 
     if (!post) {
       return res.status(404).json({
@@ -279,7 +267,7 @@ export const deletePost = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const post = await post.findOne({ _id: id, isDeleted: false });
+    const post = await Post.findOne({ _id: id, isDeleted: false });
 
     if (!post) {
       return res.status(404).json({
@@ -334,7 +322,7 @@ export const likePost = async (req, res) => {
       });
     }
 
-    const post = await post.findOne({ _id: id, isDeleted: false });
+    const post = await Post.findOne({ _id: id, isDeleted: false });
 
     if (!post) {
       return res.status(404).json({
@@ -410,8 +398,7 @@ export const getMyPosts = async (req, res) => {
       query.status = status;
     }
 
-    const posts = await post
-      .find(query)
+    const posts = await Post.find(query)
       .populate("author", "name email avatar")
       .populate("likes.user", "name avatar")
       .sort("-createdAt")
@@ -419,7 +406,7 @@ export const getMyPosts = async (req, res) => {
       .skip((page - 1) * limit)
       .lean();
 
-    const total = await post.countDocuments(query);
+    const total = await Post.countDocuments(query);
 
     res.status(200).json({
       success: true,
@@ -446,12 +433,11 @@ export const getFeaturedPosts = async (req, res) => {
   try {
     const { limit = 5 } = req.query;
 
-    const posts = await post
-      .find({
-        featured: true,
-        isDeleted: false,
-        status: "published",
-      })
+    const posts = await Post.find({
+      featured: true,
+      isDeleted: false,
+      status: "published",
+    })
       .populate("author", "name email avatar")
       .populate("likes.user", "name avatar")
       .sort("-createdAt")
@@ -480,12 +466,11 @@ export const getPopularPosts = async (req, res) => {
   try {
     const { limit = 5 } = req.query;
 
-    const posts = await post
-      .find({
-        isDeleted: false,
-        status: "published",
-        "likes.0": { $exists: true },
-      })
+    const posts = await Post.find({
+      isDeleted: false,
+      status: "published",
+      "likes.0": { $exists: true },
+    })
       .populate("author", "name email avatar")
       .populate("likes.user", "name avatar")
       .sort({ likes: -1, createdAt: -1 })
