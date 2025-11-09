@@ -154,18 +154,17 @@ export const createPost = async (req, res) => {
       title,
       content,
       tags,
-      images,
+      coverImage,
       status = "published",
       featured = false,
     } = req.body;
 
-    // Create post with authenticated user as author
     const post = await Post.create({
       title: title.trim(),
       content: content.trim(),
       author: req.user._id,
       tags: tags || [],
-      images: images || [],
+      images: coverImage ? [coverImage] : [], // Store coverImage in images array
       status,
       featured,
     });
