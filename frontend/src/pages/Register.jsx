@@ -7,7 +7,7 @@ import { useAuthStore } from "../store/useAuthStore.js";
 export default function Register() {
   // 🔑 Updated: Only name, email, and password in state
   const [form, setForm] = useState({
-    name: "",
+    username: "",
     email: "",
     password: "",
   });
@@ -38,7 +38,7 @@ export default function Register() {
       login(user, token);
 
       // Redirect to dashboard
-      navigate("/dashboard", { replace: true });
+      navigate("/", { replace: true });
     } catch (err) {
       setError(err.response?.data?.message || "Registration failed");
     } finally {
@@ -60,7 +60,7 @@ export default function Register() {
         <form onSubmit={handleSubmit} className="space-y-5">
           <input
             type="text"
-            name="name"
+            name="username"
             placeholder="Full Name"
             value={form.name}
             onChange={handleChange}
