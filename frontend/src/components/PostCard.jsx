@@ -1,21 +1,27 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 function PostCard({ post }) {
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
       {post.images && post.images.length > 0 && (
-        <img
-          src={post.images[0]}
-          alt={post.title}
-          className="w-full h-48 object-cover"
-        />
+        <Link to={`/post/${post._id}`}>
+          <img
+            src={post.images[0]}
+            alt={post.title}
+            className="w-full h-48 object-cover hover:opacity-90 transition"
+          />
+        </Link>
       )}
       <div className="p-6">
-        <h2 className="text-xl font-bold text-gray-800 mb-2 line-clamp-2">
-          {post.title}
-        </h2>
+        <Link to={`/post/${post._id}`}>
+          <h2 className="text-xl font-bold text-gray-800 mb-2 line-clamp-2 hover:text-blue-600 transition">
+            {post.title}
+          </h2>
+        </Link>
         <p className="text-gray-600 text-sm mb-3">
-          by {post.author?.username || "Anonymous"} • {new Date(post.createdAt).toLocaleDateString()}
+          by {post.author?.username || "Anonymous"} •{" "}
+          {new Date(post.createdAt).toLocaleDateString()}
         </p>
         <p className="text-gray-700 mb-4 line-clamp-3">
           {post.content.substring(0, 150)}
@@ -39,9 +45,12 @@ function PostCard({ post }) {
               </div>
             )}
           </div>
-          <button className="text-blue-600 hover:text-blue-800 font-medium text-sm">
+          <Link
+            to={`/post/${post._id}`}
+            className="text-blue-600 hover:text-blue-800 font-medium text-sm"
+          >
             Read More →
-          </button>
+          </Link>
         </div>
       </div>
     </div>

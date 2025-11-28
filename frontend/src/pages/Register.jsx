@@ -24,20 +24,16 @@ export default function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // 🗑️ Removed client-side password confirmation check
-
     setLoading(true);
 
-    // The 'form' object now only contains {name, email, password}
     try {
-      const res = await api.post("/api/auth/register", form); // Sending only the three fields
-      const { user, token } = res.data;
+      const res = await api.post("/api/auth/register", form);
+      const { token, ...userData } = res.data;
 
       // Save to Zustand (auto-persists!)
-      login(user, token);
+      login(userData, token);
 
-      // Redirect to dashboard
+      // Redirect to home
       navigate("/", { replace: true });
     } catch (err) {
       setError(err.response?.data?.message || "Registration failed");
