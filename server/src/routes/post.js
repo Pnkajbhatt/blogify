@@ -12,12 +12,22 @@ import {
   createPost,
   updatePost,
   getPosts,
+  getPost,
+  deletePost,
+  likePost,
   getMyPosts,
 } from "../controller/post.controller.js";
 import { handleImageUpload } from "../middleware/cloudinaryUpload.middleware.js";
 
 const postroute = Router();
 
+// Get all posts
+postroute.get("/", protect, validate(queryValidation, "query"), getPosts);
+
+// Get single post
+postroute.get("/:id", getPost);
+
+// Create post
 postroute.post(
   "/",
   protect,
@@ -25,6 +35,8 @@ postroute.post(
   validate(postValidation),
   createPost
 );
+
+// Update post
 postroute.put(
   "/:id",
   protect,
@@ -33,6 +45,11 @@ postroute.put(
   validate(postUpdateValidation),
   updatePost
 );
-postroute.get("/", protect, validate(queryValidation, "query"), getPosts);
+
+// Delete post
+postroute.delete("/:id", protect, deletePost);
+
+// Like/Unlike post
+postroute.put("/:id/like", protect, likePost);
 
 export default postroute;
